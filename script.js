@@ -222,7 +222,14 @@ var FormModule = {
         const formData = new FormData(form);
         return Array.from(formData.entries()).map(([key, value]) => {
             const field = form.querySelector(`[name="${key}"]`);
-            const label = form.querySelector(`label[for="${field.id}"]`);
+            // First try to find label with for attribute
+            let label = field.id ? form.querySelector(`label[for="${field.id}"]`) : null;
+
+            // If no label found, check if input is nested inside a label (common in Contact Form 7)
+            if (!label) {
+                label = field.closest('label');
+            }
+
             let labelText = label ? label.textContent.trim() : '';
             if (!labelText && field.placeholder) {
                 labelText = field.placeholder.trim();
@@ -252,7 +259,7 @@ var FormModule = {
             if (results.length === 0) return null;
 
             // Define keywords that are likely to be associated with phone numbers
-            const phoneKeywords = ['phone', 'mobile', 'cell', 'telephone', 'contact'];
+            const phoneKeywords = ['phone', 'mobile', 'cell', 'telephone', 'contact', 'tel'];
             // Define keywords that are unlikely to be phone numbers
             const nonPhoneKeywords = ['recaptcha', 'captcha', 'token', 'response', 'email', 'name'];
 
